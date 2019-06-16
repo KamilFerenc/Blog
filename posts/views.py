@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
@@ -9,11 +10,19 @@ from posts.models import Post
 class PostListView(View):
 
     def get_queryset(self):
-        return Post.objects.all()
+        return Post.objects.all().order_by('-created')
 
     def get(self, request):
         queryset = self.get_queryset()
-        context = {'posts': queryset}
+        paginator = Paginator(queryset, 5)
+        page = request.GET.get('page')
+        try:
+            posts = paginator.get_page(page)
+        except PageNotAnInteger:
+            posts = paginator.get_page(1)
+        except EmptyPage:
+            posts = paginator.get_page(paginator.num_pages)
+        context = {'posts': posts}
         return render(request, 'list.html', context)
 
 
