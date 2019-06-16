@@ -1,0 +1,14 @@
+{%  extends 'base.html' %}
+
+{% block title %}Delete post{% endblock %}
+
+{% block content %}
+
+    <form action="" method="POST">
+        <p>Do you want delete {{ post.title }}? After operation you cannot restore the post.</p>
+        <p><input type="submit" value="Yes"> </p>
+        <p><a href="{% url 'posts:detail' id=post.id %}">Cancel</a></p>
+        {% csrf_token %}
+    </form>
+
+{%  endblock %}

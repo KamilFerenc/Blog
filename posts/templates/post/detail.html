@@ -4,6 +4,9 @@
 
 {% block content %}
 
-    {{ post }}%}
+    <h4>{{ post.title }}</h4>
+    <p>{{ post.content }}</p>
+    <p><a href="{% url 'posts:delete' id=post.id %}">Delete post</a></p>
+    <p><a href="{% url 'posts:update' id=post.id %}">Edit post</a></p>
 
 {%  endblock %}
