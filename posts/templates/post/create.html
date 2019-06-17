@@ -5,8 +5,13 @@
 
 {% block content %}
 
-    <form action="" method="POST">
-        {{ form|crispy }}
+    <form action="" method="POST" enctype="multipart/form-data">
+        {{ post_form|crispy }}
+        {{ image_form.management_form }}
+        {%  for form in image_form %}
+            {{ form|crispy }}
+        {% endfor %}
+
         {% csrf_token %}
         <p><input type="submit" value="Save Post"></p>
     </form>

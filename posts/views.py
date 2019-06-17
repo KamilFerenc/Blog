@@ -1,10 +1,11 @@
 from django.contrib import messages
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.template.context import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
-from posts.forms import PostForm, PostEditForm
-from posts.models import Post
+from posts.forms import ImageFormSet, PostForm, PostEditForm
+from posts.models import Post, PostImages
 
 
 class PostListView(View):
@@ -42,18 +43,29 @@ class PostDetailView(View):
 class PostCreateView(View):
 
     def get(self, request):
-        form = PostForm()
-        context = {'form': form}
+        post_form = PostForm()
+        image_form = ImageFormSet(queryset=PostImages.objects.none())
+        context = {'post_form': post_form,
+                   'image_form': image_form}
         return render(request, 'post/create.html', context)
 
     def post(self, request):
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save()
+        post_form = PostForm(request.POST)
+        image_form = ImageFormSet(request.POST, request.FILES,
+                                  queryset=PostImages.objects.none())
+        if post_form.is_valid() and image_form.is_valid():
+            post_form = post_form.save()
+            for form in image_form.cleaned_data:
+                if form.get('image'):
+                    image = form['image']
+                    name = form['name']
+                    photo = PostImages(name=name, post=post_form, image=image)
+                    photo.save()
             message = 'Your post has been saved correctly.'
             messages.success(request, message)
-            return redirect(post.get_absolute_url())
-        context = {'form': form}
+            return redirect(post_form.get_absolute_url())
+        context = {'post_form': post_form,
+                   'image_form': image_form}
         return render(request, 'post/create.html', context)
 
 

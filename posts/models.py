@@ -13,3 +13,18 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('posts:detail', kwargs={'id': self.id})
+
+
+def get_image_filename(instance, filename):
+    id = instance.post.id
+    return f'post_images/{id}/{filename}'
+
+
+class PostImages(models.Model):
+    name = models.CharField(max_length=30, blank=True)
+    post = models.ForeignKey(Post, default=None,
+                             on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to=get_image_filename)
+
+
+
