@@ -13,7 +13,7 @@ class PostAdmin(admin.ModelAdmin):
 
 class PostImageAdmin(admin.ModelAdmin):
 
-    list_display = ('name',)
+    list_display = ('image',)
 
 
 admin.site.register(Post, PostAdmin)

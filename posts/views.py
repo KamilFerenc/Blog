@@ -1,10 +1,9 @@
 from django.contrib import messages
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.template.context import RequestContext
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
 
-from posts.forms import ImageFormSet, PostForm, PostEditForm
+from posts.forms import ImageFormSet, ImageEditFormSet, PostForm, PostEditForm
 from posts.models import Post, PostImages
 
 
@@ -36,7 +35,8 @@ class PostDetailView(View):
 
     def get(self, request, id):
         post = self.get_object
-        context = {'post': post}
+        context = {'post': post,
+                   'images': post.images.all()}
         return render(request, 'post/detail.html', context)
 
 
@@ -50,20 +50,20 @@ class PostCreateView(View):
         return render(request, 'post/create.html', context)
 
     def post(self, request):
-        post_form = PostForm(request.POST)
+        post_form = PostForm(data=request.POST)
         image_form = ImageFormSet(request.POST, request.FILES,
                                   queryset=PostImages.objects.none())
         if post_form.is_valid() and image_form.is_valid():
-            post_form = post_form.save()
+            post = post_form.save()
             for form in image_form.cleaned_data:
                 if form.get('image'):
                     image = form['image']
                     name = form['name']
-                    photo = PostImages(name=name, post=post_form, image=image)
+                    photo = PostImages(name=name, post=post, image=image)
                     photo.save()
             message = 'Your post has been saved correctly.'
             messages.success(request, message)
-            return redirect(post_form.get_absolute_url())
+            return redirect(post.get_absolute_url())
         context = {'post_form': post_form,
                    'image_form': image_form}
         return render(request, 'post/create.html', context)
@@ -73,20 +73,26 @@ class PostUpdateView(PostDetailView):
 
     def get(self, request, id):
         post = self.get_object
-        form = PostForm(instance=post)
-        context = {'form': form}
+        post_form = PostEditForm(instance=post)
+        image_form = ImageEditFormSet(instance=post)
+        context = {'post_form': post_form,
+                   'image_form': image_form}
         return render(request, 'post/update.html', context)
 
     def post(self, request, id):
-        form = PostEditForm(data=request.POST)
-        if form.is_valid():
-            post = form.save()
+        post = self.get_object
+        post_form = PostEditForm(instance=post, data=request.POST)
+        image_form = ImageEditFormSet(request.POST,
+                                      request.FILES, instance=post)
+        if post_form.is_valid() and image_form.is_valid():
+            post = post_form.save()
+            image_form.save()
             message = 'Your post has been updated correctly.'
             messages.success(request, message)
             return redirect(post.get_absolute_url())
-        else:
-            message = 'Your post has not been updated correctly.'
-            messages.success(request, message)
+        context = {'post_form': post_form,
+                   'image_form': image_form}
+        return render(request, 'post/update.html', context)
 
 
 class PostDeleteView(PostDetailView):

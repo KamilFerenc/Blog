@@ -33,3 +33,5 @@ class PostEditForm(forms.ModelForm):
 
 
 ImageFormSet = forms.modelformset_factory(PostImages, PostImageForm, extra=4)
+ImageEditFormSet = forms.inlineformset_factory(Post, PostImages,
+                                               fields=('name', 'image'))
