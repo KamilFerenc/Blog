@@ -5,7 +5,7 @@ from posts.models import PostImages, Post
 
 class PostAdmin(admin.ModelAdmin):
 
-    list_display = ('title', 'created')
+    list_display = ('title', 'created', 'slug')
     list_filter = ('created',)
     ordering = ('created',)
     search_fields = ('title',)

@@ -30,10 +30,10 @@ class PostDetailView(View):
 
     @property
     def get_object(self):
-        id = self.kwargs.get('id')
-        return get_object_or_404(Post, id=id)
+        slug = self.kwargs.get('slug')
+        return get_object_or_404(Post, slug=slug)
 
-    def get(self, request, id):
+    def get(self, request, slug):
         post = self.get_object
         context = {'post': post,
                    'images': post.images.all()}
@@ -71,7 +71,7 @@ class PostCreateView(View):
 
 class PostUpdateView(PostDetailView):
 
-    def get(self, request, id):
+    def get(self, request, slug):
         post = self.get_object
         post_form = PostEditForm(instance=post)
         image_form = ImageEditFormSet(instance=post)
@@ -79,7 +79,7 @@ class PostUpdateView(PostDetailView):
                    'image_form': image_form}
         return render(request, 'post/update.html', context)
 
-    def post(self, request, id):
+    def post(self, request, slug):
         post = self.get_object
         post_form = PostEditForm(instance=post, data=request.POST)
         image_form = ImageEditFormSet(request.POST,
@@ -97,12 +97,12 @@ class PostUpdateView(PostDetailView):
 
 class PostDeleteView(PostDetailView):
 
-    def get(self, request, id):
+    def get(self, request, slug):
         post = self.get_object
         context = {'post': post}
         return render(request, 'post/delete.html', context)
 
-    def post(self, request, id):
+    def post(self, request, slug):
         post = self.get_object
         post.delete()
         message = 'Your post has been deleted successfully.'
