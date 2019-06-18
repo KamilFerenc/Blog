@@ -4,9 +4,12 @@
 
 {% block content %}
 
+    <h1>Posts list</h1>
     {% for post in posts %}
-        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
-        <br>
+        <h3><a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+            <small> {{ post.created|timesince }} ago</small></h3>
+        <p>{{ post.content|linebreaks|truncatechars:120 }}</p>
+    <p><a href="{{ post.get_absolute_url }}" class="btn btn-primary" role="button">Detail</a></p>
     {% endfor %}
 
     {%  include 'pagination.html' with page=posts %}

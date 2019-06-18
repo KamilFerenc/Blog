@@ -4,12 +4,13 @@
 
 {% block content %}
 
-    <h4>{{ post.title }}</h4>
-    <p>{{ post.content }}</p>
-    <p><a href="{% url 'posts:delete' slug=post.slug %}">Delete post</a></p>
-    <p><a href="{% url 'posts:update' slug=post.slug %}">Edit post</a></p>
+    <h3>{{ post.title }} <small> {{ post.created }}</small></h3>
+    <p>{{ post.content|linebreaks }}</p>
     {% for image in images %}
         <p> {{ image.name }}</p>
         <img src="{{ image.image.url }}"></a>
     {% endfor %}
+    <p></p>
+    <p><a href="{% url 'posts:update' slug=post.slug %}" class="btn btn-primary" role="button">Edit post</a></p>
+    <p><a href="{% url 'posts:delete' slug=post.slug %}" class="btn btn-primary" role="button">Delete post</a></p>
 {%  endblock %}
